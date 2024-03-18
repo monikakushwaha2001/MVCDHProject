@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MVCDHProject.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 
 namespace MVCDHProject
 {
@@ -11,14 +13,23 @@ namespace MVCDHProject
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            builder.Services.AddControllersWithViews();
+            builder.Services.AddControllersWithViews(configure=>
+            {
+                var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+                configure.Filters.Add(new AuthorizeFilter(policy));
+            });
             builder.Services.AddScoped<ICustomerDAL, CustomerSqlDALcs>();
             builder.Services.AddDbContext<MVCCoreDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ConStr")));
 
             //for Connecting with Oracle
             //builder.Services.AddDbContext<MVCCoreDbContext>(options => options.UseOracleServer(builder.Configuration.GetConnectionString("ConStr")));
 
-            builder.Services.AddIdentity<IdentityUser,IdentityRole>().AddEntityFrameworkStores<MVCCoreDbContext>();
+            builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+            {
+                options.Password.RequiredLength = 8;
+                options.Password.RequireDigit = false;
+                
+            }).AddEntityFrameworkStores<MVCCoreDbContext>();
 
 
             var app = builder.Build();

@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MVCDHProject.Controllers
 {
+    [AllowAnonymous]
     public class ErrorController : Controller
     {
         [Route("ClientError/{StatusCode}")]
